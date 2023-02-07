@@ -1,9 +1,15 @@
+from unittest.mock import patch
+
 from django.test import TestCase
 from rest_framework.test import APIClient
 
+from credito.views import CreditoView
+
 
 class CreditoViewTest(TestCase):
-    def test_view_credito_calcular(self):
+
+    @patch.object(CreditoView, '_simulacao_juros', return_value=1.2)
+    def test_view_credito_calcular(self, mock):
         api = APIClient()
         data = {
             "valor_solicitado": "500",

@@ -1,3 +1,5 @@
+import random
+
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -23,7 +25,7 @@ class CreditoView(ModelViewSet):
             return Response(CreditoSerializer(credito).data)
 
         credito = credito_serializer.save()
-        juros = {1: 0.8, 5: 1.2, 10: 1.4, 15: 2.2, 20: 2.6, 25: 3.1}[credito.dia_pagamento]
+        juros = self._simulacao_juros(credito.dia_pagamento)
         valor_total = credito.valor_solicitado * pow((1 + juros/100), credito.meses_parcelamento)
         credito.valor_parcelas = valor_total / credito.meses_parcelamento
         credito.renda_necessaria = valor_total * 0.1
@@ -32,3 +34,6 @@ class CreditoView(ModelViewSet):
         credito.save()
 
         return Response(CreditoSerializer(credito).data)
+
+    def _simulacao_juros(self, dia_pagamento: int) -> float:
+        return dia_pagamento * random.choices([0.8, 1.2, 1.4, 2.2, 2.6, 3.1])[0]
